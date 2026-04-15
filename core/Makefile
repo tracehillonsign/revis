@@ -11,7 +11,7 @@ OBJS = $(patsubst src/%.c, build/%.o, $(SRCS))
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -lz
 
 build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
