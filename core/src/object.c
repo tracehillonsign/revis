@@ -1,0 +1,95 @@
+/*
+	revis/core/src/object.c
+
+	author: tracehillonsign
+*/
+
+#include "common.h"
+#include "sha256.h"
+#include "file.h"
+#include "pack.h"
+
+#define HASH_LENGTH 65
+#define MAX_PATH_LENGHT 512
+
+// Функция создания объекта файла .revis/objects.
+int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_size) {
+	if (get_file_content_size(path, file_size) != 0) {
+		fprintf(stderr, "Ошибка при получении количество байт файла (object.c : write_blob)\n");
+		return 1;
+	}
+
+	// Получаем содержимое файла и хеш содержимого.
+	char *content = NULL;
+	if (get_file_content(path, *file_size, &content) != 0) {
+		fprintf(stderr, "Ошибка чтения содержимого файла (object.c : write_blob)\n");
+		return 1;
+	}
+
+	char hash[HASH_LENGTH];
+
+	if (get_hash(content, hash) == -1) {
+		fprintf(stderr, "Ошибка вычисления хеша (object.c : write_blob)\n");
+		free(content);
+		return 1;
+	}
+
+	// Сжимаем содержимое файла.
+	size_t compressed_len;
+	unsigned char *compressed = pack(content, *file_size, &compressed_len);
+
+	if (compressed == NULL) {
+		fprintf(stderr, "Получено NULL из pack (object.c : write_blob)\n");
+		free(content);
+		return 1;
+	}
+
+	free(content);
+
+	// Собираем путь для записи файла.
+	char full_path[MAX_PATH_LENGHT];
+	snprintf(full_path, sizeof(full_path), ".revis/objects/%s", hash);
+
+	FILE *blob_file = fopen(full_path, "wbx");
+
+	if (blob_file == NULL) {
+		if (errno == EEXIST) {
+			free(compressed);
+			strcpy(output_hash, hash);
+			return 0;
+		} else {
+			perror("Ошибка создание объектного файла (object.c : write_blob)");
+			free(compressed);
+			return 1;
+		}
+	}
+
+	// Записываем сжатые данные в объектный файл.
+	if (fwrite(compressed, 1, compressed_len, blob_file) != compressed_len) {
+		if (ferror(blob_file)) {
+			perror("Ошибка записи в файл (object.c : write_blob)");
+			free(compressed);
+			fclose(blob_file);
+			return 1;
+		} else {
+			fprintf(stderr, "Записано меньше байт чем ожидалось (object.c : write_blob)\n");
+			free(compressed);
+			fclose(blob_file);
+			return 1;
+		}
+	}
+
+	free(compressed);
+	fclose(blob_file);
+
+	strcpy(output_hash, hash);
+
+
+	return 0;
+}
+
+int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
+	(void)path, (void)output_hash;
+
+	return 0;
+}
