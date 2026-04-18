@@ -39,7 +39,7 @@ git clone https://github.com/tracegillonsign/revis.git
 cd revis/core
 make
 ```
-
+> После сборки исполняемый файл **revis** появиться в core/build/
 
 
 ## 📖 Примечание
