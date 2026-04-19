@@ -113,6 +113,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
 					return 1;
 				}
 
+				// Создаем blob объект и получаем его хеш.
 				char hash[HASH_LENGTH];
 				if (write_blob(full_path, hash) == 1) {
 					fprintf(stderr, "Не удалось создать blob объект (file.c : get_dir_tree)\n");
