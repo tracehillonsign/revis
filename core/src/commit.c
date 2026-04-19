@@ -9,7 +9,9 @@
 
 // Функция создания нового коммита
 int commit(const char *message, const char *path) {
-	(void)message, (void)path;
+	(void)message;
+
+	write_tree(path);
 
 	return 0;
 }

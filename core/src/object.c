@@ -11,15 +11,16 @@
 #include "object.h"
 
 // Функция создания объекта файла .revis/objects.
-int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_size) {
-	if (get_file_content_size(path, file_size) != 0) {
+int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
+	size_t file_size = 0;
+	if (get_file_content_size(path, &file_size) != 0) {
 		fprintf(stderr, "Ошибка при получении количество байт файла (object.c : write_blob)\n");
 		return 1;
 	}
 
 	// Получаем содержимое файла и хеш содержимого.
 	char *content = NULL;
-	if (get_file_content(path, *file_size, &content) != 0) {
+	if (get_file_content(path, file_size, &content) != 0) {
 		fprintf(stderr, "Ошибка чтения содержимого файла (object.c : write_blob)\n");
 		return 1;
 	}
@@ -34,7 +35,7 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_siz
 
 	// Сжимаем содержимое файла.
 	size_t compressed_len;
-	unsigned char *compressed = pack(content, *file_size, &compressed_len);
+	unsigned char *compressed = pack(content, file_size, &compressed_len);
 
 	if (compressed == NULL) {
 		fprintf(stderr, "Получено NULL из pack (object.c : write_blob)\n");
@@ -110,12 +111,29 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_siz
 }
 
 // Функция создания дерева объектов .revis/objects.
-int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
-	DIR *dir = opendir(path);
+int write_tree(const char *path) {
+	struct Object *objects = NULL;
+	size_t object_count = 0;
 
-	if (dir == NULL) {
-		perror("Ошибка открытия директории (object.c : write_tree)");
+	if (get_dir_tree(path, path, &objects, &object_count) != 0) {
+		fprintf(stderr, "Не удалось получить древо объектов (object.c : write_tree)\n");
+
 		return 1;
+	}
+
+	if (objects != NULL) {
+		for (size_t i = 0; i < object_count; i++) {
+			
+		}
+	}
+
+	if (objects != NULL ) {
+		for (size_t i = 0; i < object_count; i++) {
+			printf("%s %s %s\n", objects[i].type, objects[i].name, objects[i].hash);
+			free(objects[i].name);
+		}
+
+		free(objects);
 	}
 
 	return 0;

@@ -12,10 +12,9 @@
 
 struct Object {
 	char type[MAX_TYPE_LENGHT];
-	size_t size;
 	char *name;
 	char hash[HASH_LENGTH];
 };
 
-int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_size);
-int write_tree(const char *path, char output_hash[HASH_LENGTH]);
+int write_blob(const char *path, char output_hash[HASH_LENGTH]);
+int write_tree(const char *path);

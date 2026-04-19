@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 
 	// Функция создания нового коммита.
 	if (strcmp(argv[1], "commit") == 0) {
-		commit(argv[2]);
+		commit(argv[2], ".");
 	}
 
 
