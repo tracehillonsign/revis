@@ -121,20 +121,14 @@ int write_tree(const char *path) {
 		return 1;
 	}
 
-	if (objects != NULL) {
-		for (size_t i = 0; i < object_count; i++) {
-			
-		}
-	}
+	// if (objects != NULL ) {
+	// 	for (size_t i = 0; i < object_count; i++) {
+	// 		printf("%s %s %s\n", objects[i].type, objects[i].name, objects[i].hash);
+	// 		free(objects[i].name);
+	// 	}
 
-	if (objects != NULL ) {
-		for (size_t i = 0; i < object_count; i++) {
-			printf("%s %s %s\n", objects[i].type, objects[i].name, objects[i].hash);
-			free(objects[i].name);
-		}
-
-		free(objects);
-	}
+	// 	free(objects);
+	// }
 
 	return 0;
 }
