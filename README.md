@@ -34,6 +34,11 @@ revis/
 
 ## 🛠️ Сборка
 
+> Зависимости (установка Ubuntu/Debian):
+```bash
+sudo apt install openssl build-essential
+```
+
 ```bash
 git clone https://github.com/tracegillonsign/revis.git
 cd revis/core
