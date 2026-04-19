@@ -5,6 +5,7 @@
 */
 
 #include "common.h"
+#include "object.h"
 
 // Вычисляет размер содержимого файла.
 int get_file_content_size(const char *path, size_t *file_size) {
@@ -51,6 +52,94 @@ int get_file_content(const char *path, size_t file_size, char **content) {
 	(*content)[file_size] = '\0'; 
 
 	fclose(file);
+
+	return 0;
+}
+
+// Собирает рекурсивано массив файлов из директории.
+int get_dir_tree(const char *path, struct Object **objects, size_t *object_count) {
+	DIR *dir = opendir(path);
+
+	if (dir == NULL) {
+		perror("Ошибка открытия директории (file.c : get_dir_tree)");
+		return 1;
+	}
+
+	struct dirent *entry;
+	struct stat st;
+
+	// Рекурсивный обход директории.
+	while((entry = readdir(dir)) != NULL) {
+		/*
+			Пропускаем текущую и родительскую директорию для избегания бесконечного цикла.
+
+			TODO:
+				Добавить проверку на нахождение файла в .revisignore
+		*/
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
+
+		char full_path[MAX_PATH_LENGHT];
+		snprintf(full_path, MAX_PATH_LENGHT, "%s/%s", path, entry->d_name);
+
+		
+
+		if (stat(full_path, &st) == 0) {
+			if (S_ISDIR(st.st_mode)) {
+				if (get_dir_tree(full_path, objects, object_count) != 0) {
+					fprintf(stderr, "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
+					closedir(dir);
+					return 1;
+				}
+			} else {
+				*objects = realloc(*objects, (*object_count + 1) * sizeof(struct Object));
+				if (*objects == NULL) {
+					perror("Ошибка выделения памяти (file.c : get_dir_tree)");
+
+					free(*objects);
+					(*object_count) = 0;
+					*objects = NULL;
+					closedir(dir);
+					return 1;
+				}
+
+				char hash[HASH_LENGTH];
+				if (write_blob(full_path, hash) == 1) {
+					fprintf(stderr, "Не удалось создать blob объект (file.c : get_dir_tree)\n");
+					
+					free(*objects);
+					(*object_count) = 0;
+					*objects = NULL;
+					closedir(dir);
+					return 1;
+				}
+
+				struct Object *new_object = &(*objects)[*object_count];
+
+				strcpy(new_object->type, "blob");
+
+				new_object->name = strdup(entry->d_name);
+				if (new_object->name == NULL) {
+					perror("Ошибка выделения памяти для поля названия (file.c : get_dir_tree)");
+					
+					free(*objects);
+					(*object_count) = 0;
+					*objects = NULL;
+					closedir(dir);
+					return 1;
+				}
+
+				strcpy(new_object->hash, hash);
+
+				(*object_count)++;
+			}
+		} else {
+			fprintf(stderr, "Cannot stat %s\n", full_path);
+		}
+	}
+
+	closedir(dir);
 
 	return 0;
 }
