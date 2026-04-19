@@ -8,8 +8,8 @@
 #include "object.h"
 
 // Функция создания нового коммита
-int commit(const char *message) {
-	(void)message;
+int commit(const char *message, const char *path) {
+	(void)message, (void)path;
 
 	return 0;
 }
