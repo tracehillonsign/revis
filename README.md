@@ -36,7 +36,7 @@ revis/
 
 > Зависимости (установка Ubuntu/Debian):
 ```bash
-sudo apt install openssl build-essential
+sudo apt install openssl build-essential zlib1g-dev
 ```
 
 ```bash
