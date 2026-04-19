@@ -94,12 +94,14 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
 
 		if (stat(full_path, &st) == 0) {
 			if (S_ISDIR(st.st_mode)) {
+				// Если путь являеться директорией вызываем в рекурсию get_dir_tree.
 				if (get_dir_tree(root, full_path, objects, object_count) != 0) {
 					fprintf(stderr, "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
 					closedir(dir);
 					return 1;
 				}
 			} else {
+				// Выделяем память на +1 объект в objcets.
 				*objects = realloc(*objects, (*object_count + 1) * sizeof(struct Object));
 				if (*objects == NULL) {
 					perror("Ошибка выделения памяти (file.c : get_dir_tree)");
@@ -122,6 +124,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
 					return 1;
 				}
 
+				// Создаем новый объект в objects и заполняем данными.
 				struct Object *new_object = &(*objects)[*object_count];
 
 				strcpy(new_object->type, "blob");
