@@ -8,9 +8,7 @@
 #include "sha256.h"
 #include "file.h"
 #include "pack.h"
-
-#define HASH_LENGTH 65
-#define MAX_PATH_LENGHT 512
+#include "object.h"
 
 // Функция создания объекта файла .revis/objects.
 int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_size) {
@@ -64,6 +62,29 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_siz
 		}
 	}
 
+	/*
+		Для записи размера используем 64-битный беззнаковый тип что бы точно знать
+		сколько размер занимает места в файле.
+
+		Потом делаем просто:
+			uint64_t saved_size;
+			fread(&saved_size, sizeof(uint64_t), 1, blob_file);
+	*/
+	uint64_t size_to_write = file_size;
+	if (fwrite(&size_to_write, sizeof(uint64_t), 1, blob_file) != 1) {
+		if (ferror(blob_file)) {
+			perror("Ошибка записи размера файла (object.c : write_blob)");
+			free(compressed);
+			fclose(blob_file);
+			return 1;
+		} else {
+			fprintf(stderr, "Записано меньше байт размера чем ожидалось (object.c : write_blob)\n");
+			free(compressed);
+			fclose(blob_file);
+			return 1;
+		}
+	}
+
 	// Записываем сжатые данные в объектный файл.
 	if (fwrite(compressed, 1, compressed_len, blob_file) != compressed_len) {
 		if (ferror(blob_file)) {
@@ -88,8 +109,14 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH], size_t *file_siz
 	return 0;
 }
 
+// Функция создания дерева объектов .revis/objects.
 int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
-	(void)path, (void)output_hash;
+	DIR *dir = opendir(path);
+
+	if (dir == NULL) {
+		perror("Ошибка открытия директории (object.c : write_tree)");
+		return 1;
+	}
 
 	return 0;
 }
