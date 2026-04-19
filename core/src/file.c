@@ -57,8 +57,8 @@ int get_file_content(const char *path, size_t file_size, char **content) {
 }
 
 // Собирает рекурсивано массив файлов из директории.
-int get_dir_tree(const char *path, struct Object **objects, size_t *object_count) {
-	DIR *dir = opendir(path);
+int get_dir_tree(const char *root, const char *current, struct Object **objects, size_t *object_count) {
+	DIR *dir = opendir(current);
 
 	if (dir == NULL) {
 		perror("Ошибка открытия директории (file.c : get_dir_tree)");
@@ -80,14 +80,21 @@ int get_dir_tree(const char *path, struct Object **objects, size_t *object_count
 			continue;
 		}
 
-		char full_path[MAX_PATH_LENGHT];
-		snprintf(full_path, MAX_PATH_LENGHT, "%s/%s", path, entry->d_name);
+		if (strcmp(entry->d_name, ".git") == 0 || strcmp(entry->d_name, ".revis") == 0) {
+    		continue;
+		}
 
-		
+		char full_path[MAX_PATH_LENGHT];
+		snprintf(full_path, MAX_PATH_LENGHT, "%s/%s", current, entry->d_name);
+
+		const char *rel_path = full_path + strlen(root);
+		if (*rel_path == '/') {
+			rel_path++;
+		}
 
 		if (stat(full_path, &st) == 0) {
 			if (S_ISDIR(st.st_mode)) {
-				if (get_dir_tree(full_path, objects, object_count) != 0) {
+				if (get_dir_tree(root, full_path, objects, object_count) != 0) {
 					fprintf(stderr, "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
 					closedir(dir);
 					return 1;
@@ -119,7 +126,7 @@ int get_dir_tree(const char *path, struct Object **objects, size_t *object_count
 
 				strcpy(new_object->type, "blob");
 
-				new_object->name = strdup(entry->d_name);
+				new_object->name = strdup(rel_path);
 				if (new_object->name == NULL) {
 					perror("Ошибка выделения памяти для поля названия (file.c : get_dir_tree)");
 					
