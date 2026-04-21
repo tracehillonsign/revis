@@ -1,7 +1,7 @@
 /*
-	revis/core/include/init.h
+        revis/core/include/init.h
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #pragma once

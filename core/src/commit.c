@@ -1,7 +1,7 @@
 /*
-	revis/core/src/commit.c
+        revis/core/src/commit.c
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #include "common.h"
@@ -9,9 +9,9 @@
 
 // Функция создания нового коммита
 int commit(const char *message, const char *path) {
-	(void)message;
+  (void)message;
 
-	write_tree(path);
+  write_tree(path);
 
-	return 0;
+  return 0;
 }

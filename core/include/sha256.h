@@ -1,7 +1,7 @@
 /*
-	revis/core/include/sha256.h
+        revis/core/include/sha256.h
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #pragma once

@@ -1,7 +1,7 @@
 /*
-	revis/core/include/commit.h
+        revis/core/include/commit.h
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #pragma once

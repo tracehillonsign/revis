@@ -1,7 +1,7 @@
 /*
-	revis/core/build/fs.c
+        revis/core/build/fs.c
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #pragma once
