@@ -1,27 +1,27 @@
 CC = gcc
-
 CFLAGS = -Wall -Wextra -Werror -Iinclude
-
 LDFLAGS = -lssl -lcrypto -lz
 
-TARGET = build/revis
+COMMON_SRCS = $(filter-out src/main.c src/debug.c, $(wildcard src/*.c))
+COMMON_OBJS = $(patsubst src/%.c, build/%.o, $(COMMON_SRCS))
 
-SRCS = $(wildcard src/*.c)
+all: prepare build/revis
 
-OBJS = $(patsubst src/%.c, build/%.o, $(SRCS))
+debug: prepare build/rdebug
 
-all: prepare $(TARGET)
+build/revis: $(COMMON_OBJS) build/main.o
+	$(CC) -o $@ $^ $(LDFLAGS)
 
-$(TARGET): $(OBJS)
+build/rdebug: $(COMMON_OBJS) build/debug.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f build/*.o build/revis build/rdebug
 
 prepare:
 	mkdir -p build
 
-.PHONY: all clean prepare
+.PHONY: all clean prepare debug
