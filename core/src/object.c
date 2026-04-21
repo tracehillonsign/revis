@@ -10,6 +10,13 @@
 #include "pack.h"
 #include "object.h"
 
+/* Это надо подумать куда перенести*/
+int cmp_struct_by_name(const void *a, const void *b) {
+    const struct Object *obj1 = (const struct Object*)a;
+    const struct Object *obj2 = (const struct Object*)b;
+    return strcmp(obj1->name, obj2->name);
+}
+
 // Функция создания объекта файла .revis/objects.
 int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
 	size_t file_size = 0;
@@ -23,8 +30,8 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
 	if (get_file_content(path, file_size, &content) != 0) {
 		fprintf(stderr, "Ошибка чтения содержимого файла (object.c : write_blob)\n");
 		return 1;
-	}
 
+	}
 	char hash[HASH_LENGTH];
 
 	if (get_hash(content, hash) == -1) {
@@ -111,7 +118,7 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
 }
 
 // Функция создания дерева объектов .revis/objects.
-int write_tree(const char *path) {
+int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
 	struct Object *objects = NULL;
 	size_t object_count = 0;
 
@@ -121,14 +128,64 @@ int write_tree(const char *path) {
 		return 1;
 	}
 
-	// if (objects != NULL ) {
-	// 	for (size_t i = 0; i < object_count; i++) {
-	// 		printf("%s %s %s\n", objects[i].type, objects[i].name, objects[i].hash);
-	// 		free(objects[i].name);
-	// 	}
+	qsort(objects, object_count, sizeof(struct Object), cmp_struct_by_name);
 
-	// 	free(objects);
-	// }
+	char *content = NULL;
+	size_t size = 0;
+
+	FILE *stream = open_memstream(&content, &size);
+	if (stream == NULL) {
+		perror("Не удалось открыть поток записи (write_tree : object.c)");
+
+		for (size_t i = 0; i < object_count; i++) {
+			free(objects[i].name);
+		}
+
+		free(objects);
+
+		return 1;
+	}
+
+	for (size_t i = 0; i < object_count; i++) {
+		fwrite(objects[i].type, 1, strlen(objects[i].type) + 1, stream);
+		fwrite(objects[i].name, 1, strlen(objects[i].name) + 1, stream);
+		fwrite(objects[i].hash, 1, strlen(objects[i].hash) + 1, stream);
+
+		free(objects[i].name);
+	}
+
+	free(objects);
+	fclose(stream);
+
+	char hash[HASH_LENGTH];
+	if (get_hash(content, hash) != 0) {
+		fprintf(stderr, "Не удалось получить хеш (write_tree : object.c)\n");
+		free(content);
+
+		return 1;
+	}
+
+	char full_path[MAX_PATH_LENGHT];
+	snprintf(full_path, sizeof(full_path), ".revis/objects/%s", hash);
+
+	FILE *file = fopen(full_path, "wbx");
+	if (file == NULL) {
+		perror("Ошибка создания файла дерева (write_tree : object.c)");
+		free(content);
+
+		return 1;
+	}
+
+	if (fwrite(content, 1, size, file) != size) {
+		fprintf(stderr, "Записано меньше байт чем ожидалось (write_tree : object.c)\n");
+		free(content);
+
+		return 1;
+	}	
+
+	fclose(file);
+	free(content);
+	strcpy(output_hash, hash);
 
 	return 0;
 }

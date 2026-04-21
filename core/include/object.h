@@ -17,4 +17,4 @@ struct Object {
 };
 
 int write_blob(const char *path, char output_hash[HASH_LENGTH]);
-int write_tree(const char *path);
+int write_tree(const char *path, char output_hash[HASH_LENGTH]);
