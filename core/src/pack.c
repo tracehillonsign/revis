@@ -18,8 +18,7 @@ unsigned char *pack(char *content, size_t content_len, size_t *dest_len) {
   }
 
   // Сжимаем полученный content.
-  int result =
-      compress(compressed, &compressed_size, (Bytef *)content, content_len);
+  int result = compress(compressed, &compressed_size, (Bytef *)content, content_len);
 
   if (result != Z_OK) {
     fprintf(stderr, "failed to compress content (pack.c : pack)\n");

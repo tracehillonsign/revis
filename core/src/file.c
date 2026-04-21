@@ -57,8 +57,7 @@ int get_file_content(const char *path, size_t file_size, char **content) {
 }
 
 // Собирает рекурсивано массив файлов из директории.
-int get_dir_tree(const char *root, const char *current, struct Object **objects,
-                 size_t *object_count) {
+int get_dir_tree(const char *root, const char *current, struct Object **objects, size_t *object_count) {
   DIR *dir = opendir(current);
 
   if (dir == NULL) {
@@ -82,8 +81,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
       continue;
     }
 
-    if (strcmp(entry->d_name, ".git") == 0 ||
-        strcmp(entry->d_name, ".revis") == 0) {
+    if (strcmp(entry->d_name, ".git") == 0 || strcmp(entry->d_name, ".revis") == 0) {
       continue;
     }
 
@@ -99,16 +97,13 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
       if (S_ISDIR(st.st_mode)) {
         // Если путь являеться директорией вызываем в рекурсию get_dir_tree.
         if (get_dir_tree(root, full_path, objects, object_count) != 0) {
-          fprintf(
-              stderr,
-              "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
+          fprintf(stderr, "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
           closedir(dir);
           return 1;
         }
       } else {
         // Выделяем память на +1 объект в objcets.
-        *objects =
-            (struct Object *)realloc(*objects, (*object_count + 1) * sizeof(struct Object));
+        *objects = (struct Object *)realloc(*objects, (*object_count + 1) * sizeof(struct Object));
         if (*objects == NULL) {
           perror("Ошибка выделения памяти (file.c : get_dir_tree)");
 
@@ -122,8 +117,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
         // Создаем blob объект и получаем его хеш.
         char hash[HASH_LENGTH];
         if (write_blob(full_path, hash) == 1) {
-          fprintf(stderr,
-                  "Не удалось создать blob объект (file.c : get_dir_tree)\n");
+          fprintf(stderr, "Не удалось создать blob объект (file.c : get_dir_tree)\n");
 
           free(*objects);
           (*object_count) = 0;

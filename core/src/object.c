@@ -22,17 +22,14 @@ int cmp_struct_by_name(const void *a, const void *b) {
 int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
   size_t file_size = 0;
   if (get_file_content_size(path, &file_size) != 0) {
-    fprintf(
-        stderr,
-        "Ошибка при получении количество байт файла (object.c : write_blob)\n");
+    fprintf(stderr, "Ошибка при получении количество байт файла (object.c : write_blob)\n");
     return 1;
   }
 
   // Получаем содержимое файла и хеш содержимого.
   char *content = NULL;
   if (get_file_content(path, file_size, &content) != 0) {
-    fprintf(stderr,
-            "Ошибка чтения содержимого файла (object.c : write_blob)\n");
+    fprintf(stderr, "Ошибка чтения содержимого файла (object.c : write_blob)\n");
     return 1;
   }
   char hash[HASH_LENGTH];
@@ -106,8 +103,7 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
       fclose(blob_file);
       return 1;
     } else {
-      fprintf(stderr,
-              "Записано меньше байт чем ожидалось (object.c : write_blob)\n");
+      fprintf(stderr, "Записано меньше байт чем ожидалось (object.c : write_blob)\n");
       free(compressed);
       fclose(blob_file);
       return 1;
@@ -128,8 +124,7 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
   size_t object_count = 0;
 
   if (get_dir_tree(path, path, &objects, &object_count) != 0) {
-    fprintf(stderr,
-            "Не удалось получить древо объектов (object.c : write_tree)\n");
+    fprintf(stderr, "Не удалось получить древо объектов (object.c : write_tree)\n");
 
     return 1;
   }
@@ -183,8 +178,7 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
   }
 
   if (fwrite(content, 1, size, file) != size) {
-    fprintf(stderr,
-            "Записано меньше байт чем ожидалось (write_tree : object.c)\n");
+    fprintf(stderr, "Записано меньше байт чем ожидалось (write_tree : object.c)\n");
     free(content);
 
     return 1;

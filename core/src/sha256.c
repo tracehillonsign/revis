@@ -22,8 +22,7 @@ int get_hash(const char *string, char outputBuffer[65]) {
     return -1;
   }
 
-  if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1 ||
-      EVP_DigestUpdate(mdctx, string, strlen(string)) != 1 ||
+  if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1 || EVP_DigestUpdate(mdctx, string, strlen(string)) != 1 ||
       EVP_DigestFinal_ex(mdctx, hash, NULL) != 1) {
     fprintf(stderr, "EVP digest failed\n");
     EVP_MD_CTX_free(mdctx);
