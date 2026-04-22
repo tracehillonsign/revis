@@ -130,6 +130,7 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
 
 // Функция создания дерева объектов .revis/objects.
 int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
+  printf("DEBUG write_tree: path='%s'\n", path);
   struct Object *objects = NULL;
   size_t object_count = 0;
 
