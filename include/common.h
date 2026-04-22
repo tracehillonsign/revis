@@ -1,5 +1,5 @@
 /*
-        revis/core/include/common.h
+        revis/include/common.h
 
         author: tracehillonsign
 */
