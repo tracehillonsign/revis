@@ -36,7 +36,7 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
   }
   char hash[HASH_LENGTH];
 
-  if (get_hash(content, hash) == -1) {
+  if (get_hash_data((unsigned char *)content, file_size, hash) == -1) {
     fprintf(stderr, "Ошибка вычисления хеша (object.c : write_blob)\n");
     free(content);
 
@@ -60,20 +60,13 @@ int write_blob(const char *path, char output_hash[HASH_LENGTH]) {
   char full_path[MAX_PATH_LENGHT];
   snprintf(full_path, sizeof(full_path), ".revis/objects/%s", hash);
 
-  FILE *blob_file = fopen(full_path, "wbx");
+  FILE *blob_file = fopen(full_path, "wb");
 
   if (blob_file == NULL) {
-    if (errno == EEXIST) {
-      free(compressed);
-      strcpy(output_hash, hash);
+    perror("Ошибка создание объектного файла (object.c : write_blob)");
+    free(compressed);
 
-      return 0;
-    } else {
-      perror("Ошибка создание объектного файла (object.c : write_blob)");
-      free(compressed);
-
-      return 1;
-    }
+    return 1;
   }
 
   /*
@@ -178,7 +171,7 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
 
   // Получаем хеш итогового содержимого который записывали в потоке.
   char hash[HASH_LENGTH];
-  if (get_hash(content, hash) != 0) {
+  if (get_hash_data((unsigned char *)content, size, hash) != 0) {
     fprintf(stderr, "Не удалось получить хеш (write_tree : object.c)\n");
     free(content);
 
@@ -189,18 +182,12 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
   snprintf(full_path, sizeof(full_path), ".revis/objects/%s", hash);
 
   // Создаем и записываем данные в объект дерева .revis/objects.
-  FILE *file = fopen(full_path, "wbx");
+  FILE *file = fopen(full_path, "wb");
   if (file == NULL) {
-    if (errno == EEXIST) {
-      free(content);
+    perror("Ошибка создания файла дерева (write_tree : object.c)");
+    free(content);
 
-      return 0;
-    } else {
-      perror("Ошибка создания файла дерева (write_tree : object.c)");
-      free(content);
-
-      return 1;
-    }
+    return 1;
   }
 
   if (fwrite(content, 1, size, file) != size) {
@@ -214,6 +201,7 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
   free(content);
   strcpy(output_hash, hash);
 
+  printf("DEBUG write_tree: result hash='%s'\n", output_hash);
   return 0;
 }
 
@@ -257,7 +245,7 @@ int write_commit(const char *message) {
   fclose(stream);
 
   // Получаем хеш итогового содержимого коммита.
-  if (get_hash(content, commit_hash) != 0) {
+  if (get_hash_data((unsigned char *)content, size, commit_hash) != 0) {
     fprintf(stderr, "Ошибка получения хеша содержимого коммита (write_commit : object.c)\n");
     free(content);
 

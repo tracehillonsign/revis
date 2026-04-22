@@ -82,12 +82,16 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
                     Добавить проверку на нахождение файла в .revisignore
     */
     if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      printf("DEBUG: found file: %s\n", entry->d_name);
       continue;
     }
 
     if (strcmp(entry->d_name, ".git") == 0 || strcmp(entry->d_name, ".revis") == 0) {
+      printf("DEBUG: found file: %s\n", entry->d_name);
       continue;
     }
+
+    printf("DEBUG: NO FOUND FILES FOR TESTTTTTTTTTTTTTT: %s\n", entry->d_name);
 
     char full_path[MAX_PATH_LENGHT];
     snprintf(full_path, MAX_PATH_LENGHT, "%s/%s", current, entry->d_name);

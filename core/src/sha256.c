@@ -40,3 +40,21 @@ int get_hash(const char *string, char outputBuffer[65]) {
 
   return 0;
 }
+
+
+int get_hash_data(const unsigned char *data, size_t len, char outputBuffer[65]) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (!mdctx) return -1;
+    if (EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL) != 1 ||
+        EVP_DigestUpdate(mdctx, data, len) != 1 ||
+        EVP_DigestFinal_ex(mdctx, hash, NULL) != 1) {
+        EVP_MD_CTX_free(mdctx);
+        return -1;
+    }
+    EVP_MD_CTX_free(mdctx);
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+        sprintf(outputBuffer + i * 2, "%02x", hash[i]);
+    outputBuffer[64] = '\0';
+    return 0;
+}
