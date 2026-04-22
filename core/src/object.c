@@ -171,10 +171,16 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
 
   FILE *file = fopen(full_path, "wbx");
   if (file == NULL) {
-    perror("Ошибка создания файла дерева (write_tree : object.c)");
-    free(content);
+    if (errno == EEXIST) {
+      free(content);
 
-    return 1;
+      return 0;
+    } else {
+      perror("Ошибка создания файла дерева (write_tree : object.c)");
+      free(content);
+
+      return 1;
+    }
   }
 
   if (fwrite(content, 1, size, file) != size) {
@@ -187,6 +193,93 @@ int write_tree(const char *path, char output_hash[HASH_LENGTH]) {
   fclose(file);
   free(content);
   strcpy(output_hash, hash);
+
+  return 0;
+}
+
+int write_commit(const char *message) {
+  char tree_hash[HASH_LENGTH];
+  if (write_tree(".", tree_hash) != 0) {
+    fprintf(stderr, "Ошибка создания коммита (write_commit : object.c)\n");
+
+    return 1;
+  }
+
+  char tree_path[MAX_PATH_LENGHT];
+  snprintf(tree_path, sizeof(tree_path), ".revis/objects/%s", tree_hash);
+
+  /*
+    TODO:
+      добавить парсинг .revis/CONFIG
+  */
+
+  const char *author = "enter_your_name";
+  const char *email = "enter_your_email";
+  char *content = NULL;
+  size_t size = 0;
+
+  FILE *stream = open_memstream(&content, &size);
+
+  if (stream == NULL) {
+    perror("Ошибка открытия потока (write_commit : object.c)");
+
+    return 1;
+  }
+
+  fwrite(author, 1, strlen(author) + 1, stream);
+  fwrite(email, 1, strlen(email) + 1, stream);
+  fwrite(message, 1, strlen(message) + 1, stream);
+  fwrite(tree_hash, 1, strlen(tree_hash) + 1, stream);
+
+  char commit_hash[HASH_LENGTH];
+  fclose(stream);
+
+  if (get_hash(content, commit_hash) != 0) {
+    fprintf(stderr, "Ошибка получения хеша содержимого коммита (write_commit : object.c)\n");
+    free(content);
+
+    return 1;
+  }
+
+  char commit_path[MAX_PATH_LENGHT];
+  snprintf(commit_path, sizeof(commit_path), ".revis/objects/%s", commit_hash);
+
+  FILE *file_commit = fopen(commit_path, "wb");
+
+  if (file_commit == NULL) {
+    perror("Ошибка создания объектного файла коммита (write_commit : object.c)");
+    free(content);
+
+    return 1;
+  }
+
+  if (fwrite(content, 1, size, file_commit) != size) {
+    fprintf(stderr, "Ошибка записи содержимого объектного файла комммта (write_commit : object.c)\n");
+    free(content);
+    fclose(file_commit);
+
+    return 1;
+  }
+
+  free(content);
+  fclose(file_commit);
+
+  FILE *head_file = fopen(".revis/HEAD", "wb");
+
+  if (head_file == NULL) {
+    perror("Ошибка открытия HEAD файла для записи хеша (write_commit : object.c)");
+
+    return 1;
+  }
+
+  if (fwrite(commit_hash, 1, strlen(commit_hash), head_file) != strlen(commit_hash)) {
+    perror("Ошибка записи в HEAD");
+    fclose(head_file);
+
+    return 1;
+  }
+
+  fclose(head_file);
 
   return 0;
 }

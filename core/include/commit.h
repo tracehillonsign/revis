@@ -6,4 +6,4 @@
 
 #pragma once
 
-int commit(const char *message, const char *path);
+int commit(const char *message);
