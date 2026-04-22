@@ -19,6 +19,7 @@ int get_hash(const char *string, char outputBuffer[65]) {
   EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
   if (!mdctx) {
     fprintf(stderr, "EVP_MD_CTX_new failed\n");
+
     return -1;
   }
 
@@ -26,6 +27,7 @@ int get_hash(const char *string, char outputBuffer[65]) {
       EVP_DigestFinal_ex(mdctx, hash, NULL) != 1) {
     fprintf(stderr, "EVP digest failed\n");
     EVP_MD_CTX_free(mdctx);
+    
     return -1;
   }
 

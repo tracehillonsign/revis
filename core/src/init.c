@@ -30,6 +30,7 @@ int init() {
 
   if (config == NULL) {
     fclose(head);
+
     return 1;
   }
 

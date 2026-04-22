@@ -13,6 +13,7 @@ int get_file_content_size(const char *path, size_t *file_size) {
 
   if (file == NULL) {
     perror("Ошибка открытия файла (file.c : get_file_content_size)");
+
     return -1;
   }
 
@@ -31,6 +32,7 @@ int get_file_content(const char *path, size_t file_size, char **content) {
 
   if (file == NULL) {
     perror("Ошибка чтения файла (file.c : get_file_content)");
+
     return 1;
   }
 
@@ -40,6 +42,7 @@ int get_file_content(const char *path, size_t file_size, char **content) {
   if (*content == NULL) {
     perror("Ошибка выделения памяти (file.c : get_file_content)");
     fclose(file);
+
     return 1;
   }
 
@@ -62,6 +65,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
 
   if (dir == NULL) {
     perror("Ошибка открытия директории (file.c : get_dir_tree)");
+
     return 1;
   }
 
@@ -99,10 +103,11 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
         if (get_dir_tree(root, full_path, objects, object_count) != 0) {
           fprintf(stderr, "Не удалось собрать дерево директории (file.c : get_dir_thee)\n");
           closedir(dir);
+
           return 1;
         }
       } else {
-        // Выделяем память на +1 объект в objcets.
+        // Выделяем память на +1 объект в структуре objcets.
         *objects = (struct Object *)realloc(*objects, (*object_count + 1) * sizeof(struct Object));
         if (*objects == NULL) {
           perror("Ошибка выделения памяти (file.c : get_dir_tree)");
@@ -111,6 +116,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
           (*object_count) = 0;
           *objects = NULL;
           closedir(dir);
+
           return 1;
         }
 
@@ -123,10 +129,11 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
           (*object_count) = 0;
           *objects = NULL;
           closedir(dir);
+
           return 1;
         }
 
-        // Создаем новый объект в objects и заполняем данными.
+        // Создаем новый объект в структуре objects и заполняем данными.
         struct Object *new_object = &(*objects)[*object_count];
 
         strcpy(new_object->type, "blob");
@@ -141,6 +148,7 @@ int get_dir_tree(const char *root, const char *current, struct Object **objects,
           (*object_count) = 0;
           *objects = NULL;
           closedir(dir);
+
           return 1;
         }
 

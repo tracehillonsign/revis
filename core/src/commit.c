@@ -11,11 +11,7 @@
 
 // Функция создания нового коммита
 int commit(const char *message) {
-  if (write_commit(message) != 0) {
-    fprintf(stderr, "Ошибка при создании коммита (commit : commit.c)\n");
-  } else {
-    printf("Коммит успешно создан!\n");
-  }
+  write_commit(message);
 
   return 0;
 }

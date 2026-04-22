@@ -14,6 +14,7 @@ unsigned char *pack(char *content, size_t content_len, size_t *dest_len) {
 
   if (compressed == NULL) {
     fprintf(stderr, "failed to allocate memory (pack.c : pack)\n");
+    
     return NULL;
   }
 
@@ -23,6 +24,7 @@ unsigned char *pack(char *content, size_t content_len, size_t *dest_len) {
   if (result != Z_OK) {
     fprintf(stderr, "failed to compress content (pack.c : pack)\n");
     free(compressed);
+    
     return NULL;
   }
 

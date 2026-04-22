@@ -11,6 +11,7 @@
 // Точка входа в программу.
 int main(int argc, char *argv[]) {
   if (argc < 2) {
+
     return 1;
   }
 
@@ -23,7 +24,9 @@ int main(int argc, char *argv[]) {
 
   // Функция создания нового коммита.
   if (strcmp(argv[1], "commit") == 0) {
-    commit(argv[2]);
+    if (commit(argv[2]) == 0) {
+      printf("Коммит успешно создан!\n");
+    }
   }
 
   return 0;
