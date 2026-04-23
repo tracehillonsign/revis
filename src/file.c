@@ -19,6 +19,6 @@ int ifile(const char *path)
     if (S_ISREG(st.st_mode)) {
         return 0;
     } else {
-        return -2;
+        return 1;
     }
 }
