@@ -1,7 +1,7 @@
 /*
-	revis/include/filep.h
+        revis/include/file.h
 
-	author: tracehillonsign
+        author: tracehillonsign
 */
 
 #pragma once
@@ -9,6 +9,5 @@
 #define FILE_H
 
 int ifile(const char *path);
-int idir(const char *path);
 
 #endif
