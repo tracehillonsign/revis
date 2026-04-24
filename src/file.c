@@ -22,3 +22,23 @@ int ifile(const char *path)
         return 1;
     }
 }
+
+/* Записывает данные в файл. */
+int wfile(const char *path, const void *data, size_t size)
+{
+    FILE *file = fopen(path, "wb");
+
+    if (file == NULL) {
+        perror("wfile: fopen");
+        return -1;
+    }
+
+    if (fwrite(data, 1, size, file) != size) {
+        perror("wfile: fwrite");
+        fclose(file);
+        return -1;
+    }
+
+    fclose(file);
+    return 0;
+}
