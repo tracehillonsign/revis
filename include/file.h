@@ -12,5 +12,6 @@
 
 int ifile(const char *path);
 int wfile(const char *path, const void *data, size_t size);
+int cfile(const char *path);
 
 #endif

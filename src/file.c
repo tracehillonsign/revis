@@ -42,3 +42,17 @@ int wfile(const char *path, const void *data, size_t size)
     fclose(file);
     return 0;
 }
+
+/* Создает файл. */
+int cfile(const char *path)
+{
+    FILE* file = fopen(path, "w");
+
+    if (file == NULL){
+        perro("не удалось создать файл (cfile : file.c)");
+        return -1;
+    }
+
+    fclose(file);
+    return 0;
+}
