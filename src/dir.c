@@ -22,3 +22,14 @@ int idir(const char *path)
         return 1;
     }
 }
+
+/* Создает директорию. */
+int cdir(const char *path)
+{
+    if (mkdir(path, 0755) == -1){
+        perror("не удалось создать директорию");
+        return -1;
+    }
+
+    return 0;
+}
