@@ -49,7 +49,7 @@ int cfile(const char *path)
     FILE* file = fopen(path, "w");
 
     if (file == NULL){
-        perro("не удалось создать файл (cfile : file.c)");
+        perror("не удалось создать файл (cfile : file.c)");
         return -1;
     }
 
