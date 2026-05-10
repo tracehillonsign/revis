@@ -7,7 +7,7 @@
 #include "common.h"
 
 /* Проверяет существует ли директория. */
-int dir_exits(const char *path)
+int dir_exists(const char *path)
 {
     DIR *dir = opendir(path);
 
