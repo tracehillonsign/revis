@@ -18,3 +18,11 @@ FILE *fopen_or_exit(const char *path, const char *mode)
 
     return file;
 }
+
+/* Создает файл. */
+int create_file(const char *path)
+{
+    FILE *file = fopen_or_exit(path, "w");
+    fclose(file);
+    return 0;
+}
