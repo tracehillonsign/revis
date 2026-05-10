@@ -18,3 +18,12 @@ int dir_exits(const char *path)
 
     return 0;
 }
+
+/* Создает директорию. */
+int create_dir(const char *path)
+{
+    /*
+            TODO: Проврка корректности создания директории
+    */
+    return mkdir(path, 0755);
+}

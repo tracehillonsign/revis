@@ -7,3 +7,4 @@
 #pragma once
 
 int dir_exits(const char *path);
+int create_dir(const char *path);
